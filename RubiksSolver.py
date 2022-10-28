@@ -115,7 +115,7 @@ class RubiksSolver:
         running this script individually,without the GUI."""
 
 
-        self.randomize()    # Scramble cube
+        #self.randomize()    # Scramble cube
 
         kociemba_input = self.encode_before_kociemba()          # Prepare input for kociemba using current cube state
 
@@ -128,8 +128,8 @@ class RubiksSolver:
 
         self.execute_solution(decoded_solution)     # Execute the moves
 
-        print("Solved: ", self.is_solved())
-        self.print_cube_state()
+        print("\nSolved: ", self.is_solved())
+        # self.print_cube_state()
 
     def encode_before_kociemba(self):
         """xxx"""
@@ -195,13 +195,27 @@ class RubiksSolver:
         *This function is to be called only by this class when 
         running this script individually,without the GUI."""
 
+        # Testing
+        print("\nStarting Cube state: ")
+        self.print_cube_state()
+        print("\n")
+
         count = 1
         for move in solution:
             self.current_side_being_moved = move[0]
             self.current_direction_of_rotation = move[1]
             self.make_move()
 
+            # Testing
+            print("Move made: ", self.current_direction_of_rotation, self.current_side_being_moved)
+            self.print_cube_state()
+            print('\n')
+
             count+=1
+        
+        # Testing
+        print("\Final Cube state: ")
+        self.print_cube_state()
 
     def make_move(self) -> None:
         """Executes the requested move by updating self.cube_state."""
