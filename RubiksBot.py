@@ -22,9 +22,9 @@ class RubiksBot:
         # Holds steps to get to any of other five positions from position 5
         self.load_instructions = {  # r= CounterClockWise, c=Clockwise
             "0": ['y'],
-            "1": ['xc', 'y'],
+            "1": ['xr', 'y'],
             "2": ['xc', 'xc', 'y'],
-            "3": ['xr', 'y'],
+            "3": ['xc', 'y'],
             "4": ['y', 'y'],
             "5": []
         }
@@ -37,13 +37,6 @@ class RubiksBot:
         self.flatten2_delay = 0.5
     
         # Servo x values
-        # [minPulse, MaxPulse, InitialAngle, minAngle, maxAngle]  
-        self.vals = [0.0004, 0.0045, 4, 0, 144] #Angle conversions: (-cw:0, 0:4, 90:27:, 180:50:, 270:74, +ccw: 77)
-        angle_range_x = self.vals[3:5]  # [Min, Max] angle range
-        initial_angle_x = self.vals[2]  # From starting angle, servo has a range of 180def ccw and 90deg cw
-        self.ccw_angle = 90
-        self.cw_angle = -90
-        self.curr_angle = 0
         self.angle_conv = {
             "-0": 0,   # Min angle
             "0": 4,
@@ -52,6 +45,14 @@ class RubiksBot:
             "270": 74,
             "+270": 77  # Max angle
         }
+        # [minPulse, MaxPulse, InitialAngle, minAngle, maxAngle]  
+        self.vals = [0.0004, 0.0045, 4, 0, 144] #Angle conversions: (-cw:0, 0:4, 90:27:, 180:50:, 270:74, +ccw: 77)
+        angle_range_x = self.vals[3:5]  # [Min, Max] angle range
+        initial_angle_x = self.vals[2]  # From starting angle, servo has a range of 180def ccw and 90deg cw
+        self.ccw_angle = -90
+        self.cw_angle = 90
+        self.curr_angle = 0
+        
 
         # Servo y values
         initial_angle_y = 20
@@ -166,34 +167,35 @@ class RubiksBot:
         
         sleep_val = None
 
-        # Update class data structure (Only if the cube is being revoled and not rotated)
+        # Update class data structure (Only if the cube is being revolved and not rotated)
         self.update_bot_state([direction, "x", 'bot']) if action == 'turn_bot' else None
         
         # Determine target angle
         angle_factor = self.cw_angle if direction == 'cw' else self.ccw_angle
         target_angle = None
         if self.curr_angle + angle_factor < 0:
+            #print("A")
             target_angle = 270
         elif self.curr_angle + angle_factor > 270:
+            #print("B")
             target_angle = 0
         else:
+            #print("C")
             target_angle = self.curr_angle + angle_factor
-        
+
 
         # Perform physical turn
-        # new_angle = self.cw_angle if direction == 'cw' else self.ccw_angle
         buffer = self.get_buffer_val(target_angle) if action == 'turn_cube' else 0
-        #print("BUFFER: ", buffer)
+        #print("BUFFER: ", buffer)   # Testing
         
         if self.curr_angle == 0 and target_angle == 270:  # Triggers a 270deg cw turn
             #print(1)
-            self.servo_x.angle = self.angle_conv['270'] + buffer  # Buffer= +
+            self.servo_x.angle = self.angle_conv['270'] + buffer  # Buffer= +*
             self.curr_angle = 270
             sleep_val = 1.5
         elif self.curr_angle == 270 and target_angle == 0:  # Triggers a 270deg ccw turn
             #print(2)
-            self.servo_x.angle = self.angle_conv['0'] + buffer  # Buffer= -
-            temp = self.curr_angle
+            self.servo_x.angle = self.angle_conv['0'] + buffer  # Buffer= -*
             self.curr_angle = 0
             sleep_val = 1.5
         else:
@@ -227,21 +229,23 @@ class RubiksBot:
         self.servo_y.angle = self.rotate_angle  # Lower hood to clamp cube
         sleep(0.5)
         self.turn_bot_x(direction, "turn_cube")      # Rotate cube side by calling function
-        sleep(1)
+        # sleep(1)
         self.servo_y.angle = self.neutral_angle
         sleep(0.5)
         
         # Revert to position without buffer
         self.servo_x.angle = self.angle_conv[str(self.curr_angle)]
-        sleep(1.5)
+        sleep(0.2)
         
         self.flatten_cube()  # Flatten cube
         
         
 if __name__ =='__main__':
     x = RubiksBot()
-    x.turn_bot_x('cw')
+    sleep(2)
+    x.turn_bot_x('ccw')
     #x.load_side('FACE')
     #x.turn_cube('ccw')
     # x.turn_cube('cw')
+    
         

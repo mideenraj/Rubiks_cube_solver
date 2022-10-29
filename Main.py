@@ -48,37 +48,59 @@ def main():
     kociemba_output = kociemba.solve(kociemba_input)        # Access the solution string
     decoded_solution = solver.decode_after_kociemba(kociemba_output)  # Decode the solution into a list of moves. Ex: [[side, direction], [...], ...]
     
-    # Testing.....
-    print("Moves count: ", len(decoded_solution))
-    for side, direction in decoded_solution:
-        print(side, direction)
-    # Testing end .....
-    
-  
+    # For Testing
+    debug1 = False
+    if debug1:
+        print("Moves count: ", len(decoded_solution))
+        for side, direction in decoded_solution:
+            print(side, direction)
+
+
     # 3. ----------------- Execute moves through bot
-    input("Press enter to begin")
+    startprints = False
+    if startprints:
+        print("Bot State: ", bot.bot_state)
+        print("Starting cube state: ")
+        solver.print_cube_state()
     
+    debug2 = False
     for side, direction in decoded_solution:
         
-        #input(f"Side being loaded: {side}")
-        bot.load_side(side)         # Load side to rotate
+        if debug2:  # Setup for debugging
+            print("Move stats : ", side, direction)
+            input("Continue...")
+            
+        bot.load_side(side)   # Load side to rotate
         
         # Update cube state in script
         solver.current_side_being_moved = side
         solver.current_direction_of_rotation = direction
-        solver.make_move()
+        solver.make_move() # Make virtual move (Also updates cube state)
+
         
+        # Testing...
         new_angle = bot.curr_angle + bot.cw_angle if direction=='cw' else bot.curr_angle + bot.ccw_angle
         if new_angle > 270:
             new_angle = 0
         elif new_angle < 0:
             new_angle = 270
         #input(f"Direction of rotation: {direction}. Moving: {bot.curr_angle} -> {new_angle}")
+        # Testing end...
+            
         bot.turn_cube(direction)    # Rotate cube
-
+        
+        if debug2:  # Setup for debugging
+            print("Post Bot State: ", bot.bot_state)
+            print("Post Cube State: ")
+            print(solver.print_cube_state())
+            input("Press to continue\n")
+        
+        
 
     print("Cube solved: ", solver.is_solved())
 
 
 
 main()
+
+
