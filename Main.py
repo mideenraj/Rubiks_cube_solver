@@ -21,13 +21,6 @@ def for_nontesting_runs(solver):
     solver.cube_state = state   # Set state
     
     
-    
-    
-    
-    
-    
-    
-
 def main():
     """Main driver function for Rubiks cube program."""
 
@@ -35,7 +28,7 @@ def main():
     solver = RubiksSolver(None)
 
     # 1. ----------------- Set start cube state
-    testing = False
+    testing = False  # Set to True if you want to use a preset cube state
     if testing:
         solver.cube_state = solver.test_cube_states[0]
 

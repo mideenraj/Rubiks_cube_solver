@@ -145,30 +145,23 @@ def both():
 def tests():
     """xxx"""
     
-    temp = [0.0005, 0.0025, 0]
-    servo_x = AngularServo(21, pin_factory = factory, initial_angle=temp[2],
-                     min_angle=0, max_angle=270,
-                     min_pulse_width=temp[0], max_pulse_width=temp[1])
+    angle_conv = {
+            "-0": 0,   # Min angle
+            "0": 4,
+            "90": 27,
+            "180": 50,
+            "270": 74,
+            "+170": 77  # Max angle
+            }
     
-    set4 = [0.0005, 0.0045, 135]    
-    servo = AngularServo(26, pin_factory = factory, initial_angle=set4[2],
-                     min_angle=0, max_angle=270,
-                     min_pulse_width=set4[0], max_pulse_width=set4[1])
+    vals = [0.0004, 0.0045, angle_conv['90'], 0, 144]
+    servo_x = AngularServo(21, pin_factory = factory, initial_angle=vals[2],
+                         min_angle=vals[3], max_angle=vals[4],
+                         min_pulse_width=vals[0], max_pulse_width=vals[1])
+    servo_x.angle = 50
     
-
-    while True:
-        x = input("Enter val: ")
-        
-
-        
-        if x == '1':
-            #GPIO.setmode(GPIO.BCM)
-            #GPIO.setup(21, GPIO.OUT)
-            servo_x.angle = 90            
-        elif x == '2':
-            #GPIO.setmode(GPIO.BCM)
-            #GPIO.setup(26, GPIO.OUT)
-            servo.angle = 90
+    
+    
 
             
     
