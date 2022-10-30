@@ -1,2 +1,4 @@
 # Rubiks_cube_solver
-Program which solves any Rubik's cube using the Kocimeba algorithm in 20 moves on less.
+The Rubiks cube solver program which solves any Rubik's cube state using the Kocimeba algorithm in 20 turns on less.
+
+Custom coded with the 3D components designed by Andrea Favero

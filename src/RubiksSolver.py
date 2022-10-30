@@ -4,10 +4,11 @@ import copy
 import random
 
 # Description: This script manages the RubiksSolver class, which holds the virtual representation of the Rubiks cube and
-#              also methods for accessing solution to any cube orientation using the kociemba algorithm.
+#              ...also methods for accessing solution to any cube orientation using the kociemba algorithm.
 
 class RubiksSolver:
-    """xxx"""
+    """Represents the Virtual representation of the Rubiks cube. Keeps state of cube, makes state changes that result from rotations
+    """
 
     def __init__(self, gui) -> None:
         """Constructor method for class."""
@@ -19,10 +20,12 @@ class RubiksSolver:
         self.current_side_being_moved = None
         self.current_direction_of_rotation = None
 
-        # Store move specifications and metrics for assist with moves: Used for updating neighboring square when making a move from ANY side. When staring 
-        #   at the side being moved, the first list aligns with the row that lies on top, the second with the column that lies to the right, the third with 
-        #   the row that lies directly at below and the fourth with the column that lies to the left. So you always start at the neighboring side that is 
-        #   directly above the moving side and work around in a clockwise fashion until all 4 neighboring sides are covered
+        """
+        Store move specifications and metrics for assist with moves: Used for updating neighboring square when making a move from any side. When staring 
+        at the side being moved, the first list aligns with the row that lies on top, the second with the column that lies to the right, the third with 
+        the row that lies directly at below and the fourth with the column that lies to the left. So you always start at the neighboring side that is 
+        directly above the moving side and work around in a clockwise fashion until all 4 neighboring sides are covered.
+        """
         self.move_directory = {
             "FACE_cw": {"side_shift_values": [2, 4, 6, -2, 0, 2, -6, -4, -2], "neighbors": ['TOP', 'RIGHT', 'BOTTOM', 'LEFT'], 
                 'neighbor_shift_values': [[-6, -4, -2], [2, -2, -6], [6, 4, 2], [-2, 2, 6]], 'base_indices': [[6, 7, 8], [0, 3, 6], [2, 1, 0], [8, 5, 2]]},
@@ -64,7 +67,7 @@ class RubiksSolver:
 
         # How the state of the cube will be represented: A dictionary with each side as a property with its values being an array of 9 elements (colors)
 
-        self.cube_state = {         # Original uninitialized state:
+        self.cube_state = {         # Original uninitialized state
             "FACE": ["Green" for _ in range(9)],
             "BACK": ["Blue" for _ in range(9)],
             "LEFT": ["Orange" for _ in range(9)],
@@ -74,48 +77,13 @@ class RubiksSolver:
         }
 
 
-
-        # States used for testing
-        self.test_cube_states = [
-            # Scenario 1: YT Video example (Solution 16: F B' U' R' U2 D B U D F2 B2 U' D' R2 L2 F2) - PASSED
-            { "FACE": ["White", "Red", "Red", "Orange", "Green", "Orange", "Green", "Blue", "Orange"],
-                "BACK": ["White", "White", "Orange", "Red", "Blue", "Orange", "Red", "Blue", "Yellow"],
-                "LEFT": ["White", "Green", "Green", "White", "Orange", "Blue", "Orange", "Green", "Yellow"],
-                "RIGHT": ["White", "Green", "Blue", "Yellow", "Red", "Yellow", "Yellow", "White", "Yellow"],
-                "TOP": ["Blue", "Red", "Red", "Orange", "White", "Yellow", "Orange", "Green", "Green"],
-                "BOTTOM": ["Red", "Red", "Blue", "White", "Yellow", "Blue", "Green", "Yellow", "Blue"]
-            },
-
-            # Scenario 2: Custom (Solution 17 R F B U' D' R L' U2 B2 L2 B2 D L2 D' R2 B2 R2) - PASSED
-            { "FACE": ["Orange", "Yellow", "White", "Red", "Green", "White", "Red", "White", "Yellow"],
-                "BACK": ["White", "White", "Orange", "Yellow", "Blue", "Orange", "White", "Yellow", "Green"],
-                "LEFT": ["Blue", "Blue", "Green", "Blue", "Orange", "Green", "Red", "Orange", "Blue"],
-                "RIGHT": ["Blue", "Green", "Red", "Green", "Red", "Green", "Red", "Blue", "Orange"],
-                "TOP": ["Yellow", "Blue", "Green", "Yellow", "White", "Orange", "Yellow", "Orange", "Orange"],
-                "BOTTOM": ["White", "Red", "Blue", "White", "Yellow", "Red", "Yellow", "Red", "Green"]
-            },
-            # Scenario 3: Custom (Solution ) - CUSTOM INPUT TESTING
-           { "FACE": ["Blue", "Green", "White", "Blue", "Green", "Green", "Yellow", "Green", "Yellow"],
-                "BACK": ["Orange", "White", "Blue", "Yellow", "Blue", "White", "Orange", "Blue", "Green"],
-                "LEFT": ["Orange", "Orange", "Red", "Red", "Orange", "Yellow", "Yellow", "Orange", "Red"],
-                "RIGHT": ["Green", "Red", "Yellow", "Red", "Red", "Red", "Red", "Yellow", "Green"],
-                "TOP": ["White", "Green", "Blue", "White", "White", "Blue", "White", "Orange", "Red"],
-                "BOTTOM": ["Green", "Yellow", "Blue", "Blue", "Yellow", "Orange", "Orange", "White", "White"]
-            }
-        ]
-
-        self.cube_state = self.cube_state
-
-       
-
     def start(self):
-        """Main function. 
+        """Driver function. 
 
         *This function is to be called only by this class when 
-        running this script individually,without the GUI."""
+        running this script individually, and not by main.py."""
 
-
-        #self.randomize()    # Scramble cube
+        self.randomize()    # Scramble cube
 
         kociemba_input = self.encode_before_kociemba()          # Prepare input for kociemba using current cube state
 
@@ -131,8 +99,11 @@ class RubiksSolver:
         print("Solved: ", self.is_solved())
         self.print_cube_state()
 
+
     def encode_before_kociemba(self):
-        """xxx"""
+        """Takes the current cube state and converts to a 54 length string that represents
+        the state of each of the 6 cube sides. This string will server as the input for
+        the kociembca module."""
 
         color_to_code_conversion = {
             'Green'  : 'F',
@@ -153,8 +124,12 @@ class RubiksSolver:
 
         return state_str
 
+
     def decode_after_kociemba(self, kociemba_solution):
-        """xxx"""
+        """Takes the solution string returned from the kociemba module and 
+        deciphers it to a nested list (i.e. [[side, direction], ...] ) that 
+        consists of moves that need to be made to solve the cube.
+        Returns: List"""
 
         code_to_side_conversion = {
             'F'  : 'FACE',
@@ -189,11 +164,12 @@ class RubiksSolver:
         # Return decoded solution
         return moves
   
+
     def execute_solution(self, solution):
         """Executes the passed list of solutions, one by one.
 
         *This function is to be called only by this class when 
-        running this script individually,without the GUI."""
+        running this script individually, and not by main.py"""
 
         count = 1
         for move in solution:
@@ -203,14 +179,17 @@ class RubiksSolver:
 
             count+=1
 
+
     def make_move(self) -> None:
         """Executes the requested move by updating self.cube_state."""
 
         # Update class cube (aka the ones stored as a dictionary)
         self.update_cube_state()
 
+
     def update_cube_state(self):
-        """xxx"""
+        """Updates the state of the cube. Use to update cube after a turn
+        has been made."""
 
         # 1. Make copy of existing state of the side being rotated (This will not be altered and will be for reference while actual list is being modified)
         #prev_state = self.cube_state[self.current_side_being_moved].copy()
@@ -246,8 +225,13 @@ class RubiksSolver:
                 new_idx = base_indices[e] + neighbor_shift_values[e]
                 self.cube_state[this_neighbors_label][new_idx] = colors[e]  
         
-    def randomize(self, count=5):
-        """xxx"""
+
+    def randomize(self, count=10):
+        """Makes count number of random rotations of random cube sides.
+        Args: count= number of random rotations. Defaults to 10
+        Return: None
+        """
+
         faces = ['FACE', 'BACK', 'LEFT', 'RIGHT', 'TOP', 'BOTTOM']
         rotations = ['cw', 'ccw']
 
@@ -260,8 +244,10 @@ class RubiksSolver:
             # Make move
             self.make_move()
         
+
     def is_solved(self):
-        """Checks if the rubik's cube has been solved or not. Return True is solved, else False."""
+        """Checks if the rubik's cube has been solved or not. Return True is solved, else False.
+        Return: Boolean"""
 
         for side in self.cube_state:
             curr_side = self.cube_state[side]
@@ -269,8 +255,10 @@ class RubiksSolver:
                 return False
         return True
 
+
     def print_cube_state(self):
-        """xxx"""
+        """Prints the Rubiks cube in its current state, representsed by
+        class variable, cube_state."""
 
         state_cpy = copy.deepcopy(self.cube_state)
         for side in state_cpy:
@@ -288,5 +276,4 @@ class RubiksSolver:
 
 if __name__ =='__main__':
     solver = RubiksSolver(None)
-    solver.cube_state = solver.test_cube_states[2]
     solver.start()
